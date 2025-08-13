@@ -1,6 +1,6 @@
-# Axibug.MHFSaveAutoConverter
+# Axibug.MHFSaveDataAutoConverter
 
-### 这是一个开源的 Monster Hunter Frontier 各版本之间的自动化迁移工具。
+### 这是一个开源的 Monster Hunter Frontier 各版本之间的玩家存档，自动化迁移工具。
 
 ### This is an open-source tool for automated migrating player savedata between different versions of Monster Hunter Frontier.
 
