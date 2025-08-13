@@ -4,9 +4,9 @@
 
 ### This is an open-source tool for automated migrating player savedata between different versions of Monster Hunter Frontier.
 
-本程序目的在于解决自动化解决MHF任意版本到MHF任何版本的相互转换问题。
+本程序目的在于解决自动化解决MHF任意版本到MHF任何版本的相互转换问题。采用各个版本分别配置，但是通用转换的方式，方便添加各种版本的数据读取配置和中间兼容互转。
 
-The purpose of this program is to automatically solve the problem of converting between any version of MHF to any other version of MHF.
+The purpose of this program is to automatically solve the problem of converting between any version of MHF to any other version of MHF. Each version is configured separately, but using a universal conversion method facilitates the addition of data reading configurations for various versions and ensures compatibility and inter-version conversion.
 
 长远核心目标是为了支持一个完整的继承链 :MH2Dos =>MHF Season=>MHF FW5 => MHFG => MHFZ
 
