@@ -411,7 +411,34 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
         public class s_pGardenData花园 : s_base_Bytesarray { }
         public class s_pRP : s_2byte_Int16_Base { }
         public class s_pKQF : s_base_Bytesarray { }
-        public class s_ItemPouch背包 : s_base_BytesarrayGroup { }
+        public class ExtraBox背包 : s_base_BytesarrayGroup { }
+        public class s_ItemPouch背包 : s_base_BytesarrayGroup {
+        
+            public override string ToString()
+            {
+                string str = string.Empty;
+
+                byte[] itemiddata = new byte[2];
+                byte[] countdata = new byte[2];
+
+                List<(int, int)> itemdata = new List<(int, int)>();
+                for (int block = 0; block < SrcCfg.block_count; block++)
+                {
+                    int startptr = (block * SrcCfg.block_single_len);
+                    for (int i = 0; i < SrcCfg.block_single_len; i++)
+                    {
+                        if (i == 0) itemiddata[0] = data[startptr + i];
+                        if (i == 1) itemiddata[1] = data[startptr + i];
+                        if (i == 2) countdata[0] = data[startptr + i];
+                        if (i == 3) countdata[1] = data[startptr + i];
+                    }
+                    itemdata.Add((HexHelper.bytesToInt(itemiddata, 2, 0), HexHelper.bytesToInt(countdata, 2, 0)));
+                }
+                foreach (var item in itemdata)
+                    str += $"{MHHelper.Get2MHFItemName(item.Item1)}:{item.Item2}\r\n";
+                return str;
+            }
+        }
         public class s_Keyquestflag : s_base_Bytesarray { }
     }
 }

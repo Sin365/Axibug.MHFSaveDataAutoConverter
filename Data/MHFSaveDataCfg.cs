@@ -68,13 +68,13 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
                    {nameof(s_SR_重弩_Status2),s_SR_重弩_Status2.CreateCfg(0xF65B+(1*9))},
                    {nameof(s_SR_弓_Status2),s_SR_弓_Status2.CreateCfg(0xF65B+(1*10)) },
 
-                   {nameof(s_ItemPresets_counts),s_ItemPresets_counts.CreateCfg(0xF960,1,30)},
                    {nameof(s_pToreData),s_pToreData.CreateCfg(0xF314,240)},
                    {nameof(s_pHR),s_pHR.CreateCfg(0xF456)},
                    {nameof(s_pGRP),s_pGRP.CreateCfg(-1)},
                    {nameof(s_pHouseData),s_pHouseData.CreateCfg(0xF461,195)},
                    {nameof(s_Gzenn) ,s_Gzenn.CreateCfg(-1)},
                    {nameof(s_Stylevouchers) ,s_Stylevouchers.CreateCfg(-1)},
+                   {nameof(s_ItemPresets_counts),s_ItemPresets_counts.CreateCfg(0xF960,1,30)},
                    {nameof(s_Socialize) ,s_Socialize.CreateCfg(0x1084C,0x10E30 - 0x1084C)},//社交数据
                    {nameof(s_CP) ,s_CP.CreateCfg(0x10944)},
                    {nameof(s_知名度) ,s_知名度.CreateCfg(0x10948)},
@@ -85,7 +85,7 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
                    {nameof(s_pRP),s_pRP.CreateCfg(0x12376)},
                    {nameof(s_pKQF),s_pKQF.CreateCfg(-1,8)},
                    /*单个道具长度8byte，前20个是item/道具 后10个是ammo/弹药*/
-                   {nameof(s_ItemPouch背包),s_ItemPouch背包.CreateCfg(-1,8,20+10)},
+                   {nameof(s_ItemPouch背包),s_ItemPouch背包.CreateCfg(0xEBC8,8,20/*+10*/)},
                    {nameof(s_Keyquestflag),s_Keyquestflag.CreateCfg(-1,8) },
                 }
             },
@@ -150,7 +150,6 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
                    {nameof(s_SR_重弩_Status2),s_SR_重弩_Status2.CreateCfg(0x1A3B0+(1*10))},
                    {nameof(s_SR_弓_Status2),s_SR_弓_Status2.CreateCfg(0x1A3B0+(1*11)) },
 
-                   {nameof(s_ItemPresets_counts),s_ItemPresets_counts.CreateCfg(0x17660,1,30)},
                    {nameof(s_pToreData),s_pToreData.CreateCfg(0x17014,240)},
                    {nameof(s_pHR),s_pHR.CreateCfg(0x17156)},
                    {nameof(s_pGRP),s_pGRP.CreateCfg(0x1715C)},
@@ -158,6 +157,7 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
                    {nameof(s_Gzenn) ,s_Gzenn.CreateCfg(0x172C4)},
                    {nameof(s_Stylevouchers) ,s_Stylevouchers.CreateCfg(-1)},
                    {nameof(s_Socialize) ,s_Socialize.CreateCfg(0x1854C,0x18B30 - 0x1854C)},//社交数据
+                   {nameof(s_ItemPresets_counts),s_ItemPresets_counts.CreateCfg(0x17660,1,30)},
                    {nameof(s_CP) ,s_CP.CreateCfg(0x18644)},
                    {nameof(s_知名度) ,s_知名度.CreateCfg(0x18648)},
                    {nameof(s_知名度称号) ,s_知名度称号.CreateCfg(0x1864C)},
@@ -167,7 +167,7 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
                    {nameof(s_pRP),s_pRP.CreateCfg(0x1A076)},
                    {nameof(s_pKQF),s_pKQF.CreateCfg(0x1B080,8)},
                    /*单个道具长度8byte，前20个是item/道具 后10个是ammo/弹药*/
-                   {nameof(s_ItemPouch背包),s_ItemPouch背包.CreateCfg(-1,8,20+10)},
+                   {nameof(s_ItemPouch背包),s_ItemPouch背包.CreateCfg(0x168C8,8,20/*+10*/)},
                    {nameof(s_Keyquestflag),s_Keyquestflag.CreateCfg(-1,8) },
                 }
             }

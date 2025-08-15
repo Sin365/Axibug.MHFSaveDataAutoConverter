@@ -111,6 +111,7 @@ namespace Axibug.MHFSaveAutoConverter
                     continue;
                 }
 
+                //if (!UpdateTargetDB(targetuserid, is_female, name, targetdata))
                 if (!InsertTargetDB(targetuserid, is_female, name, targetdata))
                 {
                     Console.WriteLine($"写入目标{target}数据库失败");
@@ -130,6 +131,15 @@ namespace Axibug.MHFSaveAutoConverter
             var savedataparam = new NpgsqlParameter("@savedata", NpgsqlDbType.Bytea);
             savedataparam.Value = targetdata;
             return SQLRUN_TARGET_DB.ExcuteSQL(str,new List<NpgsqlParameter> { savedataparam });
+        }
+
+
+        public static bool UpdateTargetDB(long cid, bool is_female, string name, byte[] targetdata)
+        {
+            string str = $"UPDATE \"characters\" set savedata =  @savedata where \"id\" = {cid};";
+            var savedataparam = new NpgsqlParameter("@savedata", NpgsqlDbType.Bytea);
+            savedataparam.Value = targetdata;
+            return SQLRUN_TARGET_DB.ExcuteSQL(str, new List<NpgsqlParameter> { savedataparam });
         }
 
         //public static SaveDataEntity SetData(long cid, string name, byte[] srcdata)

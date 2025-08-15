@@ -39,13 +39,13 @@ namespace Axibug.MHFSaveAutoConverter.Data
                 byte[] decdata = MHFCompression.Decompress(src);
                 System.IO.File.WriteAllBytes(path, decdata);
                 Console.WriteLine($"{from}_{srccid}_角色数据{name},已保存数据到:{path}");
+                SaveDataEntity se = new SaveDataEntity(from, target, decdata);
                 if (onlydumpsrc)
                 {
                     err = default;
                     targetdata = default;
                     return true;
                 }
-                SaveDataEntity se = new SaveDataEntity(from, target, decdata);
                 string updateoutpath = $"update_{target}_cid_{srccid}_{DateTime.Now.ToString("yyyyMMddHHmmss")}" + "_fixed.bin";
                 targetdata = se.DoConvert();
                 System.IO.File.WriteAllBytes(updateoutpath, targetdata);
