@@ -1,8 +1,12 @@
 ﻿using Axibug.MHFSaveAutoConverter.Data;
+using Axibug.MHFSaveAutoConverter.DataStruct;
 using Axibug.MHFSaveAutoConverter.SQL;
 using HaoYue.MHFUserSrv.Server.Common;
+using MonsterHunterSaveBruteForce;
 using Npgsql;
 using NpgsqlTypes;
+using System;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using static Axibug.MHFSaveAutoConverter.DataStruct.MHFSaveDataCfg;
 
@@ -13,6 +17,7 @@ namespace Axibug.MHFSaveAutoConverter
         static void Main(string[] args)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            //MH2DosSaveDataLoader.LoadSaveData();
             Console.Title = "皓月云MHF存档迁移工具 ver 0.1.0";
             Console.WriteLine("读取配置");
             try
@@ -29,8 +34,26 @@ namespace Axibug.MHFSaveAutoConverter
             while (true)
             {
                 Console.WriteLine($"==欢迎使用 {Console.Title} Axibug.MHFSaveAutoConverter==");
+
+                int funcid = 0;
+                while (true)
+                {
+                    Console.WriteLine("Step0.使用什么功能？[0]存档继承，[1]存档修复 What function to use? [0] userdata inheritance, [1] userdata repair");
+                    string var = Console.ReadLine();
+                    if (!int.TryParse(var, out funcid))
+                        continue;
+
+                    break;
+                }
+
+                if (funcid == 1)
+                {
+                    FixedItemBox();
+                    break;
+                }
+
                 string[] verlist = Enum.GetNames(typeof(MHFVer));
-                
+
                 MHFVer src;
                 MHFVer target;
                 while (true)
@@ -73,7 +96,7 @@ namespace Axibug.MHFSaveAutoConverter
                     continue;
                 }
                 Console.WriteLine("===>操作的角色ID:" + cid);
-                if (!SaveDataCoverter.loadCharacterOLD(cid, out string name,out bool is_female, out byte[] srcdata))
+                if (!SaveDataCoverter.loadCharacterOLD(cid, out string name, out bool is_female, out byte[] srcdata))
                 {
                     Console.WriteLine("读取失败");
                     continue;
@@ -112,7 +135,7 @@ namespace Axibug.MHFSaveAutoConverter
                 }
 
                 //if (!UpdateTargetDB(targetuserid, is_female, name, targetdata))
-                if (!InsertTargetDB(targetuserid, is_female, name, targetdata))
+                if (!SaveDataCoverter.InsertTargetDB_new(targetuserid, is_female, name, targetdata))
                 {
                     Console.WriteLine($"写入目标{target}数据库失败");
                     continue;
@@ -124,22 +147,54 @@ namespace Axibug.MHFSaveAutoConverter
         }
 
 
-        public static bool InsertTargetDB(long uid,bool is_female,string name, byte[] targetdata)
-        {
-            string str = "INSERT INTO \"public\".\"characters\" (\"user_id\", \"is_female\", \"is_new_character\", \"name\", \"unk_desc_string\", \"gr\", \"hr\", \"weapon_type\", \"last_login\", \"savedata\", \"decomyset\", \"hunternavi\", \"otomoairou\", \"partner\", \"platebox\", \"platedata\", \"platemyset\", \"rengokudata\", \"savemercenary\", \"restrict_guild_scout\", \"minidata\", \"gacha_items\", \"daily_time\", \"house_info\", \"login_boost\", \"skin_hist\", \"kouryou_point\", \"gcp\", \"guild_post_checked\", \"time_played\", \"weapon_id\", \"scenariodata\", \"savefavoritequest\", \"friends\", \"blocked\", \"deleted\", \"cafe_time\", \"netcafe_points\", \"boost_time\", \"cafe_reset\", \"bonus_quests\", \"daily_quests\", \"promo_points\", \"rasta_id\", \"pact_id\", \"stampcard\", \"mezfes\") " +
-                $"VALUES ({uid}, '{(is_female?"t":"f")}', 'f', '{name}', '', 0, 0, 0, 1750087006, @savedata, NULL, NULL, NULL, E'\\\\001cmp 20110113   \\\\000\\\\000\\\\002\\\\001\\\\250\\\\000\\\\377\\\\000\\\\255'::bytea, NULL, NULL, NULL, NULL, NULL, 'f', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-05-26 11:24:26.725902+08', 0, 0, E'\\\\000\\\\000\\\\000\\\\000\\\\000\\\\000\\\\000\\\\000\\\\000\\\\000'::bytea, E'\\\\001\\\\000\\\\001\\\\000\\\\001\\\\000\\\\001\\\\000\\\\001\\\\000\\\\000\\\\000\\\\000\\\\000\\\\000'::bytea, '', '', 'f', 0, 0, NULL, NULL, 0, 0, 0, NULL, NULL, 0, NULL);";
-            var savedataparam = new NpgsqlParameter("@savedata", NpgsqlDbType.Bytea);
-            savedataparam.Value = targetdata;
-            return SQLRUN_TARGET_DB.ExcuteSQL(str,new List<NpgsqlParameter> { savedataparam });
-        }
 
-
-        public static bool UpdateTargetDB(long cid, bool is_female, string name, byte[] targetdata)
+        public static bool FixedItemBox()
         {
-            string str = $"UPDATE \"characters\" set savedata =  @savedata where \"id\" = {cid};";
-            var savedataparam = new NpgsqlParameter("@savedata", NpgsqlDbType.Bytea);
-            savedataparam.Value = targetdata;
-            return SQLRUN_TARGET_DB.ExcuteSQL(str, new List<NpgsqlParameter> { savedataparam });
+            string[] verlist = Enum.GetNames(typeof(MHFVer));
+            MHFVer src;
+            while (true)
+            {
+                Console.WriteLine("Step1.选择要继承的角色的原始MHF版本: Select the original MHF version of the character you want to inherit:");
+                for (int i = 0; i < verlist.Length; i++)
+                    Console.WriteLine($"[{i}]{verlist[i]}");
+
+                int srcidx;
+                string ver = Console.ReadLine();
+                if (!int.TryParse(ver, out srcidx))
+                    continue;
+                if (srcidx >= 0 && srcidx < verlist.Length)
+                {
+                    src = (MHFVer)Enum.Parse(typeof(MHFVer), verlist[srcidx]);
+                    break;
+                }
+            }
+            Console.WriteLine($"step3.请输入[{src}]版本中的源Characters表中的角色ID: Please enter the character ID from the source Characters table in [{src}] version:");
+            if (!long.TryParse(Console.ReadLine(), out long cid))
+            {
+                Console.WriteLine("输入有误");
+                return false;
+            }
+            Console.WriteLine("===>操作的角色ID:" + cid);
+            if (!SaveDataCoverter.loadCharacterOLD(cid, out string name, out bool is_female, out byte[] srcdata))
+            {
+                Console.WriteLine("读取失败");
+                return false;
+            }
+
+            if (!SaveDataCoverter.FixedSaveData(src, src, srcdata, out byte[] targetdata, out string err))
+            {
+                Console.WriteLine($"处理失败:{err}");
+                return false;
+            }
+
+            if (!SaveDataCoverter.UpdateTargetDB_old(cid, targetdata))
+            {
+                Console.WriteLine($"处理失败:{err}");
+                return false;
+            }
+
+            Console.WriteLine($"写入玩家{name}修正数据");
+            return true;
         }
 
         //public static SaveDataEntity SetData(long cid, string name, byte[] srcdata)

@@ -64,6 +64,11 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
             {
                 return this.ToString();
             }
+
+            public virtual bool FixedData(out string log)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public class s_base_Byte : s_Base
@@ -269,10 +274,10 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
                     int startptr = (block * SrcCfg.block_single_len);
                     for (int i = 0; i < SrcCfg.block_single_len; i++)
                     {
-                        if (i == 4) itemiddata[0] = data[startptr + i];
-                        if (i == 5) itemiddata[1] = data[startptr + i];
-                        if (i == 6) countdata[0] = data[startptr + i];
-                        if (i == 7) countdata[1] = data[startptr + i];
+                        if (i == 0) itemiddata[0] = data[startptr + i];
+                        if (i == 1) itemiddata[1] = data[startptr + i];
+                        if (i == 2) countdata[0] = data[startptr + i];
+                        if (i == 3) countdata[1] = data[startptr + i];
                     }
                     itemdata.Add((HexHelper.bytesToInt(itemiddata, 2, 0), HexHelper.bytesToInt(countdata, 2, 0)));
                 }
@@ -280,7 +285,55 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
                     str += $"{MHHelper.Get2MHFItemName(item.Item1)}:{item.Item2}\r\n";
                 return str;
             }
+
+            public override bool FixedData(out string log)
+            {
+                if (!SrcVerHad)
+                {
+                    log = "没有数据";
+                    return false;
+                }
+
+                log = this.GetType().Name + "\r\n";
+                byte[] itemiddata = new byte[2];
+                byte[] countdata = new byte[2];
+                List<(int, int)> itemdata = new List<(int, int)>();
+                for (int block = 0; block < SrcCfg.block_count; block++)
+                {
+                    int startptr = (block * SrcCfg.block_single_len);
+                    for (int i = 0; i < SrcCfg.block_single_len; i++)
+                    {
+                        if (i == 0) itemiddata[0] = data[startptr + i];
+                        if (i == 1) itemiddata[1] = data[startptr + i];
+                        if (i == 2) countdata[0] = data[startptr + i];
+                        if (i == 3) countdata[1] = data[startptr + i];
+                    }
+
+                    uint itemid = HexHelper.bytesToUInt(itemiddata, 2, 0);
+                    uint count = HexHelper.bytesToUInt(countdata, 2, 0);
+                    if (itemid < 0)
+                        continue;
+
+                    //log += $"[{block}]{itemid}:{MHHelper.Get2MHFItemName((int)itemid)}:{count}\r\n";
+
+                    if (SrcVer == MHFVer.GG)
+                    {
+                        bool needfix = (itemid >= 9749);
+
+                        if (needfix)
+                        {
+                            //抹除数据
+                            for (int i = 0; i < SrcCfg.block_single_len; i++)
+                                data[startptr + i] = 0x00;
+                            log += $"抹除数据:[{block}]{itemid}:{MHHelper.Get2MHFItemName((int)itemid)}:{count}\r\n";
+                        }
+                    }
+                }
+
+                return false;
+            }
         }
+
         public class s_pPlaytime : s_4byte_UInt32_Base
         {
             public override string ToString()
@@ -340,18 +393,18 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
         public class s_SR_重弩 : s_4byte_UInt32_Base { }
         public class s_SR_弓 : s_4byte_UInt32_Base { }
 
-        public class s_SR_片手_Status1 : s_base_Byte{}
-        public class s_SR_双刀_Status1 :s_base_Byte{}
-        public class s_SR_大剑_Status1 :s_base_Byte{}
-        public class s_SR_太刀_Status1 :s_base_Byte{}
-        public class s_SR_锤子_Status1 :s_base_Byte{}
-        public class s_SR_笛_Status1 :s_base_Byte{}
-        public class s_SR_长枪_Status1 :s_base_Byte{}
-        public class s_SR_铳枪_Status1 :s_base_Byte{}
-        public class s_SR_穿龙棍_Status1 :s_base_Byte{}
-        public class s_SR_轻弩_Status1 :s_base_Byte{}
-        public class s_SR_重弩_Status1 :s_base_Byte{}
-        public class s_SR_弓_Status1 : s_base_Byte {}
+        public class s_SR_片手_Status1 : s_base_Byte { }
+        public class s_SR_双刀_Status1 : s_base_Byte { }
+        public class s_SR_大剑_Status1 : s_base_Byte { }
+        public class s_SR_太刀_Status1 : s_base_Byte { }
+        public class s_SR_锤子_Status1 : s_base_Byte { }
+        public class s_SR_笛_Status1 : s_base_Byte { }
+        public class s_SR_长枪_Status1 : s_base_Byte { }
+        public class s_SR_铳枪_Status1 : s_base_Byte { }
+        public class s_SR_穿龙棍_Status1 : s_base_Byte { }
+        public class s_SR_轻弩_Status1 : s_base_Byte { }
+        public class s_SR_重弩_Status1 : s_base_Byte { }
+        public class s_SR_弓_Status1 : s_base_Byte { }
 
         public class s_SR_片手_Status2 : s_base_Byte { }
         public class s_SR_双刀_Status2 : s_base_Byte { }
@@ -412,8 +465,9 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
         public class s_pRP : s_2byte_Int16_Base { }
         public class s_pKQF : s_base_Bytesarray { }
         public class ExtraBox背包 : s_base_BytesarrayGroup { }
-        public class s_ItemPouch背包 : s_base_BytesarrayGroup {
-        
+        public class s_ItemPouch背包 : s_base_BytesarrayGroup
+        {
+
             public override string ToString()
             {
                 string str = string.Empty;

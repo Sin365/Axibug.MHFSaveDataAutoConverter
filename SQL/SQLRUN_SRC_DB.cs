@@ -88,7 +88,8 @@ namespace Axibug.MHFSaveAutoConverter.SQL
             }
         }
 
-        public static bool ExcuteSQL(string strSql)
+
+        public static bool ExcuteSQL(string strSql, List<NpgsqlParameter> param = null)
         {
             NpgsqlConnection con = GetSqlConnect();
             bool bneedPush = true;
@@ -100,6 +101,13 @@ namespace Axibug.MHFSaveAutoConverter.SQL
             {
                 using (NpgsqlCommand SqlCommand = new NpgsqlCommand(strSqlinsert, con))
                 {
+                    if (param != null)
+                    {
+                        foreach (NpgsqlParameter p in param)
+                        {
+                            SqlCommand.Parameters.Add(p);
+                        }
+                    }
                     setnumbert = SqlCommand.ExecuteNonQuery();
                 }
                 PushConnect(con);
@@ -115,6 +123,33 @@ namespace Axibug.MHFSaveAutoConverter.SQL
                 return false;
             }
         }
+        //public static bool ExcuteSQL(string strSql)
+        //{
+        //    NpgsqlConnection con = GetSqlConnect();
+        //    bool bneedPush = true;
+        //    if (string.IsNullOrEmpty(strSql))
+        //        return false;
+        //    string strSqlinsert = strSql;
+        //    int setnumbert = 0;
+        //    try
+        //    {
+        //        using (NpgsqlCommand SqlCommand = new NpgsqlCommand(strSqlinsert, con))
+        //        {
+        //            setnumbert = SqlCommand.ExecuteNonQuery();
+        //        }
+        //        PushConnect(con);
+        //        bneedPush = false;
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        if (bneedPush)
+        //        {
+        //            PushConnect(con);
+        //        }
+        //        return false;
+        //    }
+        //}
 
         public static DateTime ConvertTimestamptzToDatetime(object obj)
         {

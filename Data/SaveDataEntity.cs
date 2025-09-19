@@ -2,6 +2,7 @@
 using System.Data;
 using static Axibug.MHFSaveAutoConverter.DataStruct.DataStruct;
 using static Axibug.MHFSaveAutoConverter.DataStruct.MHFSaveDataCfg;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Axibug.MHFSaveAutoConverter.DataStruct
 {
     public class SaveDataEntity
@@ -69,6 +70,35 @@ namespace Axibug.MHFSaveAutoConverter.DataStruct
             }
             Console.WriteLine("====写入完毕====");
             return data;
+        }
+
+
+
+        public byte[] FixedEquipBox(byte[] srcdata, out string log)
+        {
+            log = null;
+            byte[] targetdata = srcdata.ToArray();
+
+            Console.WriteLine("====尝试开始写入====");
+            foreach (var singledata in saveHandles)
+            {
+                if (!(singledata is s_Itembox itembox))
+                    continue;
+
+                itembox.FixedData(out log);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(singledata.GetType().Name);
+                Console.ForegroundColor = ConsoleColor.White;
+                string str = singledata.ToString();
+                if (str.Length > 100)
+                    str = str.Substring(0, 100) + "...";
+
+                bool ret = singledata.Write(TargetVer, targetdata);
+                Console.WriteLine($"写入:{singledata.GetType().Name} =>{(ret ? "成功" : "失败")}");
+                Console.WriteLine(str);
+            }
+            Console.WriteLine("====写入完毕====");
+            return targetdata;
         }
     }
 
